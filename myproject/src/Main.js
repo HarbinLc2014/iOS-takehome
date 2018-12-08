@@ -48,9 +48,10 @@ export default class Main extends Component {
    //header:null,
  };
 }
-  state = {photoData: null, firstPart:null, secondPart:null, lArray:[], rArray:[], featured:true};
+  state = {marBot:[], page: 1, photoData: null, firstPart:null, secondPart:null, lArray:[], rArray:[], featured:true};
   componentWillMount() {
-    unsplash.photos.listCuratedPhotos(1,40,"latest").then(data=>{
+    this.setState({page : 1});
+    unsplash.photos.listCuratedPhotos(this.state.page,30,"latest").then(data=>{
       console.log(JSON.parse(data._bodyText)[0]);
       this.setState({photoData:JSON.parse(data._bodyText)});
       var index = 0;
@@ -67,12 +68,78 @@ export default class Main extends Component {
           Arr[(index-1)/2] = h;
           this.setState({rArray: Arr});
         }
+      //  var botArr = this.state.marBot;
+      //  var aa = this.getMarBot(index);
+      //  botArr.push(aa);
+      //  this.setState({marBot: botArr});
         index+=1;
       });
 //        console.log('lArray ',this.state.lArray);
 //        console.log('rArray ',this.state.rArray);
 
     })
+  }
+  handleEndd = async () => {
+    console.log(this.state.stage);
+    this.setState(state => ({ page: state.page+1}), () => {
+      unsplash.photos.listCuratedPhotos(this.state.page,30,"latest").then(data=>{
+        var pData = JSON.parse(data._bodyText);
+        var aData = this.state.photoData;
+        var index = 0;
+        pData.forEach((e)=>{
+          var h = e.height/e.width*(SCREEN_WIDTH/2-10);
+          if(index%2==0){
+            var Arr = this.state.lArray;
+            Arr[index/2+((this.state.page-1)*30/2)] = h;
+          //  console.log('index: ',index/2+(this.state.page*30/2));
+            this.setState({lArray: Arr});
+          }
+          else if(index%2==1){
+            var Arr = this.state.rArray;
+            Arr[(index-1)/2+((this.state.page-1)*30/2)] = h;
+      //      console.log('index: ',index/2+(this.state.page*30/2));
+            this.setState({rArray: Arr});
+          }
+          index+=1;
+        });
+      var cData = aData.concat(pData);
+      this.setState({photoData: cData});
+    //  console.log(this.state.lArray);
+    //  console.log(this.state.rArray);
+    }
+    );
+    });
+  }
+  handleEnd = async () => {
+    console.log('asdasd');
+    this.setState({ page: this.state.page+1 });
+    unsplash.photos.listCuratedPhotos(this.state.page,30,"latest").then(data=>{
+      var pData = JSON.parse(data._bodyText);
+      var aData = this.state.photoData;
+      var index = 0;
+      pData.forEach((e)=>{
+        var h = e.height/e.width*(SCREEN_WIDTH/2-10);
+        if(index%2==0){
+          var Arr = this.state.lArray;
+          Arr[index/2+(this.state.page*30/2)] = h;
+          console.log('index: ',index,'h: ',h);
+          this.setState({lArray: Arr});
+        }
+        else if(index%2==1){
+          var Arr = this.state.rArray;
+          Arr[(index-1)/2+(this.state.page*30/2)] = h;
+          console.log('index: ',index,'h: ',h);
+          this.setState({rArray: Arr});
+        }
+        index+=1;
+      });
+    var cData = aData.concat(pData);
+    this.setState({photoData: cData});
+    console.log(this.state.lArray);
+    console.log(this.state.rArray);
+  }
+  );
+  console.log(this.getMarBot(22));
   }
   onClick() {
     console.log('clicked!');
@@ -151,6 +218,7 @@ export default class Main extends Component {
       return 0;
     }
     */
+
     if(index%2==0){
       var larr = this.state.lArray.slice(0,index/2);
       var rarr = this.state.rArray.slice(0,index/2);
@@ -159,6 +227,7 @@ export default class Main extends Component {
       if(suml<sumr){
         return suml-sumr;
       }
+
     }
     else if(index%2==1){
       var larr = this.state.lArray.slice(0,(index-1)/2);
@@ -172,10 +241,14 @@ export default class Main extends Component {
 
     return 0;
   }
+
   renderData() {
     if(this.state.featured){
       return       <FlatList ref="flatlist"
                 style={{ backgroundColor: '#fff', marginTop:0, marginBottom: 0 }}
+                 keyExtractor={(x, i) => i}
+                 onEndReached={()=>this.handleEndd()}
+                 onEndReachThreshold={0}
                  numColumns={2}
                  renderItem={({ item, index })=>
                   <ListItem navigation={this.props.navigation} marBot={this.getMarBot(index)} index={index} width={item.width} height={item.height} source={{uri: item.urls.full}} item={item} />
