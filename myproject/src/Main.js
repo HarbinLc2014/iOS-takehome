@@ -22,17 +22,6 @@ const authenticationUrl = unsplash.auth.getAuthenticationUrl([
 ]);
 
 
-// unsplash.photos.listPhotos(2,15,"latest").then(data=>{
-// //  console.log(data._bodyInit[0]);
-// //  console.log(data._bodyText[0]);
-// }).catch(err=>{
-//   console.log(err);
-// })
-
-// unsplash.search.photos('dogs',1,1).then(data=>{
-//   //console.log(JSON.parse(data._bodyInit).results[0].urls.full);
-// })
-
 export default class Main extends Component {
   static navigationOptions = (props) => {
 
@@ -68,14 +57,8 @@ export default class Main extends Component {
           Arr[(index-1)/2] = h;
           this.setState({rArray: Arr});
         }
-      //  var botArr = this.state.marBot;
-      //  var aa = this.getMarBot(index);
-      //  botArr.push(aa);
-      //  this.setState({marBot: botArr});
         index+=1;
       });
-//        console.log('lArray ',this.state.lArray);
-//        console.log('rArray ',this.state.rArray);
 
     })
   }
@@ -175,50 +158,8 @@ export default class Main extends Component {
     }
     return 0;
   }
-  getMarBot(index) {
-  /*  console.log(index);
-    var v1 = 0;
-    var v2 = 0;
-    var flag = false;
-    if(index>1){
-      if(index%2==0 && this.state.photoData){
-        v1 = this.state.photoData[index-2];
-        v2 = this.state.photoData[index-1];
-        if(!this.state.lArray[(index-2)/2]){
-          console.log('Push element to lArray');
-          this.state.lArray.push(v1.height/v1.width*(SCREEN_WIDTH/2-10));
-        }
-        else{
-          console.log(this.state.lArray[(index-2)/2]);
-        }
-        if(!this.state.rArray[(index-2)/2]){
-          console.log('Push element to rArray');
-          this.state.rArray.push(v2.height/v2.width*(SCREEN_WIDTH/2-10));
-        }
-        else{
-          console.log(this.state.rArray[(index-2)/2]);
-        }
-      }
-      else if(index%2==1 && this.state.photoData){
-    //    v1 = this.state.photoData[index-3];
-    //    v2 = this.state.photoData[index-2];
-      }
-      var h1 = this.getSum(this.state.lArray, index);
-      var h2 = this.getSum(this.state.rArray, index);
-    //  console.log(this.state.lArray);
-    //  console.log(this.state.rArray);
-      if(index%2==0 && h1<h2 && index>1){
-        console.log(index, h1-h2);
-        return h1-h2;
-      }
-      else if(index%2==1 && h1>h2 && index>1){
-        console.log(index, h2-h1);
-        return h2-h1;
-      }
-      return 0;
-    }
-    */
 
+  getMarBot(index) {
     if(index%2==0){
       var larr = this.state.lArray.slice(0,index/2);
       var rarr = this.state.rArray.slice(0,index/2);
@@ -227,7 +168,6 @@ export default class Main extends Component {
       if(suml<sumr){
         return suml-sumr;
       }
-
     }
     else if(index%2==1){
       var larr = this.state.lArray.slice(0,(index-1)/2);
@@ -238,13 +178,12 @@ export default class Main extends Component {
         return sumr-suml;
       }
     }
-
     return 0;
   }
 
   renderData() {
     if(this.state.featured){
-      return       <FlatList ref="flatlist"
+      return   <FlatList ref="flatlist"
                 style={{ backgroundColor: '#fff', marginTop:0, marginBottom: 0 }}
                  keyExtractor={(x, i) => i}
                  onEndReached={()=>this.handleEndd()}
@@ -263,7 +202,6 @@ export default class Main extends Component {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent:'center' }}>
       {this.renderData()}
-
           <View style={{ width: SCREEN_WIDTH, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height:40, marginTop:10 }}>
               <TouchableOpacity style={this.state.featured? Styles.style2 : Styles.style1} onPress={()=> {  this.setState({featured: true});}}>
               <Text style={{ color: 'white' }}>Featured</Text>
