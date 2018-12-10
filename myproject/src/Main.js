@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Button, Image, FlatList, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
+import {Bubbles, DoubleBounce, Bars, Pulse} from 'react-native-loader';
+
 import Unsplash from 'unsplash-js/native';
 
 import ListItem from './ListItem';
@@ -37,7 +39,7 @@ export default class Main extends Component {
    //header:null,
  };
 }
-  state = {marBot:[], page: 1, photoData: null, firstPart:null, secondPart:null, lArray:[], rArray:[], featured:true};
+  state = {handling: false, loading: false, marBot:[], page: 1, photoData: null, firstPart:null, secondPart:null, lArray:[], rArray:[], featured:true};
   componentWillMount() {
     this.setState({page : 1});
     unsplash.photos.listCuratedPhotos(this.state.page,30,"latest").then(data=>{
@@ -63,7 +65,9 @@ export default class Main extends Component {
     })
   }
   handleEndd = async () => {
-    console.log(this.state.stage);
+    if(!this.state.loading){
+    this.setState({loading: true});
+  //  console.log(this.state.stage);
     this.setState(state => ({ page: state.page+1}), () => {
       unsplash.photos.listCuratedPhotos(this.state.page,30,"latest").then(data=>{
         var pData = JSON.parse(data._bodyText);
@@ -87,67 +91,15 @@ export default class Main extends Component {
         });
       var cData = aData.concat(pData);
       this.setState({photoData: cData});
-    //  console.log(this.state.lArray);
-    //  console.log(this.state.rArray);
+      this.setState({loading: false});
+      console.log(this.state.lArray);
+      console.log(this.state.rArray);
     }
     );
     });
+    }
   }
-  handleEnd = async () => {
-    console.log('asdasd');
-    this.setState({ page: this.state.page+1 });
-    unsplash.photos.listCuratedPhotos(this.state.page,30,"latest").then(data=>{
-      var pData = JSON.parse(data._bodyText);
-      var aData = this.state.photoData;
-      var index = 0;
-      pData.forEach((e)=>{
-        var h = e.height/e.width*(SCREEN_WIDTH/2-10);
-        if(index%2==0){
-          var Arr = this.state.lArray;
-          Arr[index/2+(this.state.page*30/2)] = h;
-          console.log('index: ',index,'h: ',h);
-          this.setState({lArray: Arr});
-        }
-        else if(index%2==1){
-          var Arr = this.state.rArray;
-          Arr[(index-1)/2+(this.state.page*30/2)] = h;
-          console.log('index: ',index,'h: ',h);
-          this.setState({rArray: Arr});
-        }
-        index+=1;
-      });
-    var cData = aData.concat(pData);
-    this.setState({photoData: cData});
-    console.log(this.state.lArray);
-    console.log(this.state.rArray);
-  }
-  );
-  console.log(this.getMarBot(22));
-  }
-  onClick() {
-    console.log('clicked!');
-  }
-  renderPhotoType(signal) {
-  let type = [];
-  if(this.state.photoData){
-    var length = this.state.photoData.length;
-    var firstPart = this.state.photoData.slice(0,Math.floor(length/2));
 
-    var secondPart = this.state.photoData.slice(Math.floor(length/2)+1,20);
-
-    var data = [firstPart, secondPart];
-    data[signal].map( ( item )=> {
-    type.push(
-      <View>
-        <TouchableOpacity>
-              <Image style={{width: SCREEN_WIDTH/2, height: item.height/item.width*(SCREEN_WIDTH/2) }} source={{uri: item.urls.full}}  />
-        </TouchableOpacity>
-      </View>
-    );
-  } );
-  }
-  return type;
-  }
   getSum(arr){
     var a = 0;
     if(arr){
@@ -180,7 +132,16 @@ export default class Main extends Component {
     }
     return 0;
   }
-
+  ListFooterComponent() {
+    if(this.state.loading){
+    return(
+      <View style={{ width: SCREEN_WIDTH, height: 30, justifyContent:'center', alignItems:'center' }}>
+      <Bubbles size={10} color="#000" />
+      </View>
+    );
+  }
+  return <View />;
+  }
   renderData() {
     if(this.state.featured){
       return   <FlatList ref="flatlist"
@@ -189,6 +150,7 @@ export default class Main extends Component {
                  onEndReached={()=>this.handleEndd()}
                  onEndReachThreshold={0}
                  numColumns={2}
+              //   ListFooterComponent={this.ListFooterComponent.bind(this)}
                  renderItem={({ item, index })=>
                   <ListItem navigation={this.props.navigation} marBot={this.getMarBot(index)} index={index} width={item.width} height={item.height} source={{uri: item.urls.full}} item={item} />
                   }
