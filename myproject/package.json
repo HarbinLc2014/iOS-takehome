@@ -16,6 +16,7 @@
     "react-native-loader": "^1.2.1",
     "react-navigation": "^3.0.6",
     "react-redux": "^5.1.1",
+    "react-timer-mixin": "^0.13.4",
     "redux": "^4.0.1",
     "unsplash-js": "^4.8.0"
   },

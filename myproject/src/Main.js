@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Button, Image, FlatList, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, Button, Image, FlatList, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
 import {Bubbles, DoubleBounce, Bars, Pulse} from 'react-native-loader';
-
+import Timer from 'react-timer-mixin';
 import Unsplash from 'unsplash-js/native';
 
 import ListItem from './ListItem';
@@ -68,8 +68,9 @@ export default class Main extends Component {
     if(!this.state.loading){
     this.setState({loading: true});
   //  console.log(this.state.stage);
-    this.setState(state => ({ page: state.page+1}), () => {
-      unsplash.photos.listCuratedPhotos(this.state.page,30,"latest").then(data=>{
+
+     this.setState(state => ({ page: state.page+1}), () => {
+       unsplash.photos.listCuratedPhotos(this.state.page,30,"latest").then(data=>{
         var pData = JSON.parse(data._bodyText);
         var aData = this.state.photoData;
         var index = 0;
@@ -96,6 +97,7 @@ export default class Main extends Component {
       console.log(this.state.rArray);
     }
     );
+
     });
     }
   }
@@ -136,7 +138,7 @@ export default class Main extends Component {
     if(this.state.loading){
     return(
       <View style={{ width: SCREEN_WIDTH, height: 30, justifyContent:'center', alignItems:'center' }}>
-      <Bubbles size={10} color="#000" />
+      <ActivityIndicator size="large" color="#d1d1d1" />
       </View>
     );
   }
@@ -145,12 +147,12 @@ export default class Main extends Component {
   renderData() {
     if(this.state.featured){
       return   <FlatList ref="flatlist"
-                style={{ backgroundColor: '#fff', marginTop:0, marginBottom: 0 }}
+                style={{ backgroundColor: '#fff', marginTop:0, marginBottom: 0, marginLeft:5, marginRight:5, width:SCREEN_WIDTH-10 }}
                  keyExtractor={(x, i) => i}
                  onEndReached={()=>this.handleEndd()}
                  onEndReachThreshold={0}
                  numColumns={2}
-              //   ListFooterComponent={this.ListFooterComponent.bind(this)}
+                 ListFooterComponent={this.ListFooterComponent.bind(this)}
                  renderItem={({ item, index })=>
                   <ListItem navigation={this.props.navigation} marBot={this.getMarBot(index)} index={index} width={item.width} height={item.height} source={{uri: item.urls.full}} item={item} />
                   }
